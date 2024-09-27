@@ -1,0 +1,22 @@
+from flask import Flask, request
+from user_agents import parse
+
+app = Flask(__name__)
+
+@app.route('/')
+def fingerprint():
+    user_agent = request.headers.get('User-Agent')
+    ua = parse(user_agent)
+    ip_address = request.remote_addr
+    browser = ua.browser.family
+    os = ua.os.family
+    device = ua.device.family
+
+    # Store the fingerprint data
+    with open("fingerprints.log", "a") as f:
+        f.write(f"{ip_address}, {browser}, {os}, {device}\n")
+
+    return f"Your IP: {ip_address}, Browser: {browser}, OS: {os}, Device: {device}"
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=8080)
